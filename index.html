@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: 0;
+            font-family: sans-serif;
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+            min-height: 500px;
+            border-radius: 20px;
+            background: white;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #e0eafc;
+        }
+        .drag-area {
+            border: 3px dashed #e0eafc;
+            box-shadow: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 10px auto;
+            height: 400px;
+            width: 100%;
+        }
+        .drag-area.active {
+            border-color: #1683ff;
+        }
+        .drag-area img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Upload your File</h3>
+        <div class="drag-area">
+            <div class="icon">
+
+            </div>
+            <span class="header">Drag & Drop</span>
+            <span class="header"> or <a href="#" class="button">Browse</a> </span>
+            <input hidden name="" type="file">
+            <span class="support">Supports: JPEG, JPG & PNG </span>
+        </div>
+    </div>
+
+    <script>
+        const dragArea = document.querySelector('.drag-area');
+        const dragText = document.querySelector('.header');
+        const input = document.querySelector('input');
+        const button = document.querySelector('.button');
+        let file;
+
+        // when the button is clicked
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            input.click();
+        });
+
+        // when browse
+        input.addEventListener('change', (event) => {
+            file = event.target.files[0];
+            dragArea.classList.add('active');
+            displayFile();
+        });
+
+        // when file is inside the drag area
+        dragArea.addEventListener('dragover', (event) => { 
+            console.log('File is inside the drag area');
+            event.preventDefault();
+            dragText.textContent = 'Release to Upload';
+            dragArea.classList.add('active')
+        })
+
+        // when fil eleaves the drag area
+        dragArea.addEventListener('dragleave', () => {
+            console.log('drag leave');
+            dragText.textContent = 'Drag and Drop';
+            dragArea.classList.remove('active')
+        });
+
+        // when the file is dropped in drag area
+        dragArea.addEventListener('drop', (event) => {
+            console.log('the file is dropped inside drag area');
+            event.preventDefault();
+            
+            file = event.dataTransfer.files[0]
+            displayFile();
+        });
+
+        function displayFile() {
+            let fileType = file.type;
+            let validExtensions = ['image/jpeg', 'image/png', 'image/jpg'];
+
+            if(validExtensions.includes(fileType)) {
+                let fileReader = new FileReader();
+
+                fileReader.onload = () => {
+                    let fileURL = fileReader.result;
+                    let imgTag = `<img src="${fileURL}">`;
+                    dragArea.innerHTML = imgTag;
+                }
+
+                fileReader.readAsDataURL(file);
+            }else {
+                alert("File type not supported");
+                dragArea.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
